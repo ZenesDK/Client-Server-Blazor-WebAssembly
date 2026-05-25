@@ -16,6 +16,9 @@ public class ProductsController(AppDbContext db) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(Product product)
     {
+        // Если модель не прошла валидацию (например, цена < 0)
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
         db.Products.Add(product);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(Get), new { product.Id }, product);
@@ -24,8 +27,11 @@ public class ProductsController(AppDbContext db) : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Product product)
     {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
         var existing = await db.Products.FindAsync(id);
         if (existing is null) return NotFound();
+        
         existing.Name = product.Name;
         existing.Price = product.Price;
         existing.Description = product.Description;
