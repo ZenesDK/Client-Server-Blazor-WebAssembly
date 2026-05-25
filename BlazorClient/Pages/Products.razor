@@ -1,0 +1,121 @@
+@page "/products"
+@inject IProductService ProductService
+@inject IJSRuntime JS
+
+<h3>Управление товарами</h3>
+
+<button @onclick="OpenCreateForm" class="btn btn-primary mb-3">Добавить товар</button>
+
+@if (products == null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else if (!products.Any())
+{
+    <p>Товары отсутствуют. Добавьте первый товар!</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Описание</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Price.ToString("C")</td>
+                    <td>@product.Description</td>
+                    <td>
+                        <button @onclick="() => OpenEditForm(product)" class="btn btn-warning btn-sm me-2">Изменить</button>
+                        <button @onclick="() => DeleteProduct(product.Id)" class="btn btn-danger btn-sm">Удалить</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showEditForm)
+{
+    <EditProduct Product="@editingProduct" 
+                 OnSave="SaveProduct" 
+                 OnCancel="CloseForm" />
+}
+
+@code {
+    private List<Product> products = new();
+    private bool showEditForm;
+    private Product editingProduct = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            products = (await ProductService.GetAsync()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка загрузки: {ex.Message}");
+        }
+    }
+
+    private void OpenCreateForm()
+    {
+        editingProduct = new Product();
+        showEditForm = true;
+    }
+
+    private void OpenEditForm(Product product)
+    {
+        editingProduct = new Product 
+        { 
+            Id = product.Id, 
+            Name = product.Name, 
+            Price = product.Price, 
+            Description = product.Description 
+        };
+        showEditForm = true;
+    }
+
+    private async Task SaveProduct(Product product)
+    {
+        if (product.Id == 0)
+        {
+            await ProductService.AddAsync(product);
+        }
+        else
+        {
+            await ProductService.UpdateAsync(product);
+        }
+        
+        showEditForm = false;
+        await LoadProducts();
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Удалить товар?");
+        if (confirmed)
+        {
+            await ProductService.DeleteAsync(id);
+            await LoadProducts();
+        }
+    }
+
+    private void CloseForm()
+    {
+        showEditForm = false;
+    }
+}

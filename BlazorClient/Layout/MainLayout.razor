@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Магазин</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">Главная</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/products">Товары</NavLink>
+                </li>
+            </ul>
+            <ThemeSwitcher />
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    @Body
+</div>

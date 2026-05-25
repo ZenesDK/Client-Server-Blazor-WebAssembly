@@ -1,0 +1,54 @@
+<div class="card mt-3">
+    <div class="card-header">
+        <h5>@(Product.Id == 0 ? "Добавление товара" : "Редактирование товара")</h5>
+    </div>
+    <div class="card-body">
+        <EditForm Model="@Product" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            
+            <div class="mb-3">
+                <label class="form-label">Название</label>
+                <InputText @bind-Value="Product.Name" class="form-control" placeholder="Введите название" />
+                <ValidationMessage For="@(() => Product.Name)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Цена</label>
+                <InputNumber @bind-Value="Product.Price" TValue="decimal" class="form-control" placeholder="Введите цену" />
+                <ValidationMessage For="@(() => Product.Price)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Описание</label>
+                <InputTextArea @bind-Value="Product.Description" class="form-control" rows="3" placeholder="Введите описание" />
+                <ValidationMessage For="@(() => Product.Description)" class="text-danger" />
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">Сохранить</button>
+                <button type="button" @onclick="HandleCancel" class="btn btn-secondary">Отмена</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Product Product { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public EventCallback<Product> OnSave { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback OnCancel { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        await OnSave.InvokeAsync(Product);
+    }
+
+    private async Task HandleCancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}
