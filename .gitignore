@@ -38,3 +38,6 @@ secrets.json
 Thumbs.db
 *.tmp
 *.log
+
+analyze_project.py
+project_structure_and_content.txt

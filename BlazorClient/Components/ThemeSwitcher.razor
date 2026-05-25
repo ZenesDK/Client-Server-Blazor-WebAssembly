@@ -5,12 +5,19 @@
 @code {
     private string icon = "🌙";
     
-    [Inject] 
-    private IJSRuntime JS { get; set; } = default!;
-    
+    [Inject] private ThemeService ThemeService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isDark = await ThemeService.IsDarkModeAsync();
+        icon = isDark ? "☀️" : "🌙";
+        // Применяем тему при первой загрузке
+        await ThemeService.SetThemeAsync(isDark); 
+    }
+
     private async Task ToggleTheme()
     {
-        var isDark = await JS.InvokeAsync<bool>("eval", "document.documentElement.classList.toggle('dark-mode')");
-        icon = isDark ? "☀️" : "🌙";
+        await ThemeService.ToggleThemeAsync();
+        icon = await ThemeService.IsDarkModeAsync() ? "☀️" : "🌙";
     }
 }
