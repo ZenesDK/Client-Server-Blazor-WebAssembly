@@ -30,7 +30,7 @@ else
             {
                 <tr>
                     <td>@product.Name</td>
-                    <td>@product.Price.ToString("C")</td>
+                    <td>@product.Price.ToString("F2") ₽</td>
                     <td>@product.Description</td>
                     <td>
                         <button @onclick="() => OpenEditForm(product)" class="btn btn-warning btn-sm me-2">Изменить</button>
